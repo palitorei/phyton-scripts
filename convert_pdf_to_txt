@@ -1,0 +1,43 @@
+import os
+from PyPDF2 import PdfReader
+
+print("Script iniciado.")
+
+print("Iniciando a conversão de PDF para TXT...")
+
+# Define o diretório raiz a partir do qual iniciar a busca por arquivos PDF
+diretorio_raiz = 'C:\Users\lukas\Desktop\RMBC Method'
+
+# Contador para verificar quantos arquivos foram processados
+arquivos_processados = 0
+
+# Percorre o diretório raiz e todas as suas subdiretórios
+for raiz, subpastas, arquivos in os.walk(diretorio_raiz):
+    for nome_arquivo in arquivos:
+        if nome_arquivo.endswith('.pdf'):
+            # Incrementa o contador
+            arquivos_processados += 1
+
+            # Caminho completo do arquivo PDF
+            caminho_completo_pdf = os.path.join(raiz, nome_arquivo)
+            print(f"Processando: {caminho_completo_pdf}")
+            
+            # Abre e lê o arquivo PDF
+            leitor_pdf = PdfReader(caminho_completo_pdf)
+            texto_completo = ''
+            for pagina in leitor_pdf.pages:
+                texto_completo += pagina.extract_text() + '\n' if pagina.extract_text() else ''
+            
+            # Define o nome e o caminho do arquivo TXT de saída
+            nome_arquivo_txt = os.path.splitext(nome_arquivo)[0] + '.txt'
+            caminho_completo_txt = os.path.join(raiz, nome_arquivo_txt)
+            
+            # Salva o texto no arquivo TXT na mesma subpasta de origem
+            with open(caminho_completo_txt, 'w', encoding='utf-8') as arquivo_txt:
+                arquivo_txt.write(texto_completo)
+            
+            print(f"Arquivo '{nome_arquivo}' convertido para TXT com sucesso.")
+
+# Verifica se nenhum arquivo foi processado
+if arquivos_processados == 0:
+    print("Nenhum arquivo PDF foi encontrado para processamento.")
